@@ -1,0 +1,118 @@
+---
+title: "Demand Supply Analysis with R"
+author: "Krushna Hajare" 
+toc: true
+---
+## About Deamand and Supply
+
+The quantity of a good or service that consumers are willing to buy at a specific price during a specific time period is known as the demand for that good or service. And the quantity that producers are willing to offer on the market at a specific price and for a specific period of time is the supply for a good or service.
+
+For organizations to improve operations, maximize profits, and make wise decisions, they must have a solid understanding of demand and supply. One of the difficult applications of demand and supply analysis is analyzing the demand and supply for taxi services like Ola, Uber, food services like Zomato, Swiggy even product base organisations like Myntra and Amazon and many more.
+
+Now we can see that most of the working professionals and also common men use cabs to travel in city. We also usually use cabs if we want to reach some place urgently, to save our time. It help us to save our time.
+
+The new new companies are introducing themselves in transportation market. For Example Rapido is new in market as compare to Ola and Uber. And also some people introduce their private vehicles in cab services.
+
+It became important to give better experience to the customers by understanding and analyzing the patterns in demand and supply industry.
+
+## Demand and Supply Analysis
+
+Demand and Supply analysis means analyzing the relationship between the quantity demanded and the quantity supplied. It helps businesses understand the factors influencing consumer demand to maximize profits.
+
+Here we need a dataset to do this analysis. I am taking dataset from the platform [Statso.io](https://statso.io/case-studies/), a platform to study case studies regarding data science.
+
+
+
+NOTE: It is impotant to call all packages which are useful in this analysis, before starting analysis. 
+```{r}
+#| label: import packages 
+#| message: false
+library(tidyverse)
+library(kableExtra)
+library(readr)
+library(skimr)
+```
+
+
+## About Dataset
+Here is a dataset of the demand for rides and the supply of drivers in a particular city. Below are the features in the dataset:
+
+1.  drivers_active: Number of drivers active per hour.
+
+2.  riders_active: Number of Riders looking for rides.
+
+3.  rides_completed: Number of rides completed.
+
+```{r}
+#| label: Import Data
+#| message: false
+rides <- read_csv("rides.csv")
+```
+
+Cleaning dataset is the first step in analysis. It includes treating missing values outliers. 
+```{r}
+#| label: missing values
+colSums(is.na(rides)) # find out missing values. 
+
+rides <- na.omit(rides) #drop NA values. 
+
+```
+
+The original data have a long variable names in capital alphabates, which may creat difficulties at the time of analysis. That's why we changed the variable names here.
+```{r}
+#| label: rename variables 
+colnames(rides) <- c("drivers_active", "riders_active", "rides_completed")
+
+glimpse(rides)
+```
+Data is cleaned and there are 1,045 samples in this data with 3 variables.
+Now we all set to go for analysis. 
+
+## Vizualisation 
+Now let’s analyze the relationship between the number of drivers active per hour and the number of riders active per hour:
+
+```{r}
+#| label: relation in drivers and riders
+#| message: false
+ggplot(rides, aes(x = drivers_active, 
+                  y = riders_active)) +
+  geom_point(color = "red")+
+  geom_smooth(color = "black")+
+  labs(
+    title = "Demand and Supply Analysis",
+    subtitle = "Relation between Active Drivers and Active Riders",
+    x = "Active Drivers", 
+    y = "Active Riders")
+```
+So there is a constant relationship between the number of drivers active per hour and the number of riders active per hour.
+
+A constant relationship between the number of drivers active per hour and the number of riders active per hour means that for every X number of drivers, there is a consistent and predictable Y number of riders, and this ratio remains constant over time.
+
+## Supply Ratio
+Now let’s add a new column in the dataset by calculating the supply ratio:
+supply ratio is nothing but rides completed per driver active per hour.
+```{r}
+#| label: supply ratio 
+#| message: false
+rides <- rides |> 
+  mutate(supply_ratio = rides_completed/drivers_active)
+head(rides, 5)
+
+ggplot(rides, aes(x = drivers_active, 
+                  y = supply_ratio)) +
+  geom_point(color = "blue") +
+  geom_smooth(color = "red") +
+  labs(
+    x = "Drivers active per hour",
+    y = "Supply Ratio",
+    title = "Relationship between Supply Ratio and Driver Activity")
+  
+  
+
+
+```
+So, if the the numbers of drivers active per hour is less then the supply ratio is high, and vise versa. 
+
+
+
+
